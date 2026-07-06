@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swift Mover Support — Comment Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #050608;
+    --panel: #10141b;
+    --panel-2: #151a22;
+    --line: #1f2733;
+    --blue: #1e88f7;
+    --blue-2: #0b6fd6;
+    --blue-ice: #7fc4ff;
+    --white: #f5f8fc;
+    --grey: #8b97a8;
+    --grey-dim: #5c6879;
+    --glow: 0 0 20px rgba(30,136,247,0.2);
+    --hero-scan: rgba(30,136,247,0.04);
+    --wordmark-top: #ffffff;
+    --wordmark-bot: #cfe6ff;
+    --navbg: rgba(5,6,8,0.94);
+  }
+
+  html.light{
+    /* Premium Low-Glare Matte Slate Theme */
+    --black: #cbd5e1;
+    --panel: #f1f5f9;
+    --panel-2: #e2e8f0;
+    --line: #94a3b8;
+    --blue: #1a7ae0;
+    --blue-2: #0b5fc0;
+    --blue-ice: #1e293b;
+    --white: #0f172a;
+    --grey: #475569;
+    --grey-dim: #64748b;
+    --glow: 0 0 20px rgba(26,122,224,0.15);
+    --hero-scan: rgba(15,23,42,0.03);
+    --wordmark-top: #0f172a;
+    --wordmark-bot: #1e293b;
+    --navbg: rgba(203,213,225,0.94);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background: var(--black);
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition: background-color .2s ease, color .2s ease;
+  }
+
+  /* Premium Skewed Header Design Restored */
+  header.hero{
+    position:relative;
+    padding: 28px 16px 20px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+    background: var(--black);
+  }
+  header.hero::before{
+    content:"";
+    position:absolute;
+    top:-40%; left:-10%;
+    width:120%; height:180%;
+    background: repeating-linear-gradient(-20deg, var(--hero-scan) 0px, var(--hero-scan) 2px, transparent 2px, transparent 40px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.25em;
+    font-size:11px;
+    color:var(--blue);
+    text-transform:uppercase;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-weight: 600;
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:"";
+    width:30px; height:1px;
+    background:linear-gradient(90deg, transparent, var(--blue));
+  }
+  .eyebrow::after{ background:linear-gradient(90deg, var(--blue), transparent); }
+
+  h1.wordmark{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:800;
+    font-style:italic;
+    font-size: clamp(36px, 6vw, 54px);
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin:0;
+    text-transform:uppercase;
+    background: linear-gradient(180deg, var(--wordmark-top) 0%, var(--wordmark-top) 55%, var(--wordmark-bot) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    transform: skewX(-6deg);
+    display: inline-block;
+  }
+  h1.wordmark span{
+    display:inline-block;
+    margin-left: 8px;
+    background: linear-gradient(180deg, var(--blue-ice) 0%, var(--blue) 60%, var(--blue-2) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .tagline{
+    margin: 10px 0 0;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:600;
+    letter-spacing:0.06em;
+    font-size: 13.5px;
+    color:var(--grey);
+    text-transform:uppercase;
+  }
+  .tagline b{ color:var(--white); font-weight:700; }
+  .tagline .accent{ color:var(--blue); font-weight:700; }
+
+  nav.jumpnav{
+    position:sticky; top:0; z-index:50;
+    background:var(--navbg);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line);
+    padding: 8px 16px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  nav.jumpnav::-webkit-scrollbar{ display:none; }
+  nav.jumpnav a{
+    flex:0 0 auto;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing: 0.03em;
+    color:var(--grey);
+    text-decoration:none;
+    padding:5px 12px;
+    border-radius:4px;
+    border:1px solid var(--line);
+    background: var(--panel);
+    transition: all .15s ease;
+  }
+  nav.jumpnav a:hover{
+    color: var(--white);
+    border-color: var(--blue);
+    box-shadow: var(--glow);
+  }
+
+  .search-container {
+    max-width: 960px;
+    margin: 16px auto 0 auto;
+    padding: 0 16px;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-size: 14.5px;
+    font-family: 'Inter', sans-serif;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: var(--glow);
+  }
+
+  .theme-toggle{
+    flex:0 0 auto;
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--white);
+    background: linear-gradient(180deg, var(--blue) 0%, var(--blue-2) 100%);
+    border: none;
+    padding:6px 14px;
+    border-radius:4px;
+    cursor:pointer;
+    box-shadow: var(--glow);
+  }
+  .theme-toggle:hover{
+    filter: brightness(1.1);
+  }
+
+  main{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 16px 16px 60px;
+  }
+
+  section.category{
+    margin-bottom: 32px;
+    scroll-margin-top: 60px;
+  }
+
+  .cat-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:14px;
+    padding-bottom:8px;
+    border-bottom: 2px solid var(--blue);
+  }
+  .cat-index{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    font-weight: bold;
+    color: var(--white);
+    background: var(--blue-2);
+    padding:3px 8px;
+    border-radius:4px;
+  }
+  .cat-title{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:22px;
+    text-transform:uppercase;
+    letter-spacing: 0.02em;
+    margin:0;
+  }
+  .cat-sub{
+    font-size:12px;
+    color:var(--grey-dim);
+    margin-left:auto;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .shuffle-btn {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  .shuffle-btn:hover {
+    border-color: var(--blue);
+    background: var(--panel-2);
+  }
+
+  .comments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .comment-row{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:12px 16px;
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .comment-row:hover{
+    border-color: var(--blue);
+    background: var(--panel-2);
+  }
+  .comment-text{
+    flex:1;
+    font-size:15px;
+    line-height:1.45;
+    font-weight: 500;
+  }
+
+  .copy-btn{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: linear-gradient(180deg, var(--blue) 0%, var(--blue-2) 100%);
+    color:#fff;
+    border:none;
+    padding:6px 14px;
+    border-radius:4px;
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    text-transform:uppercase;
+    cursor:pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .copy-btn.copied{
+    background: #17b06c;
+  }
+
+  .dialogue{
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 18px;
+    margin-bottom:12px;
+  }
+  .dialogue .line{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    margin-bottom:10px;
+    padding-bottom:10px;
+    border-bottom:1px dashed var(--line);
+  }
+  .dialogue .line:last-of-type{ border-bottom:none; margin-bottom:0; padding-bottom:0;}
+  .dialogue .who{
+    font-family:'Barlow Condensed', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    text-transform:uppercase;
+    padding:3px 10px;
+    border-radius:4px;
+    flex-shrink:0;
+    letter-spacing: 0.04em;
+  }
+  .who.mover{ background:var(--line); color:var(--white); }
+  .who.you{ background:rgba(30,136,247,0.15); color:var(--blue); border:1px solid var(--blue); }
+  .dialogue .line .content{ flex:1; }
+  .dialogue .line .content .said{
+    font-size:14.5px;
+    line-height:1.5;
+  }
+  .dialogue .line.you-line .content{
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .dialogue .line.you-line .said{ flex:1; }
+
+  .plan-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display: flex;
+    flex-direction: column;
+    gap:8px;
+  }
+  .plan-list li{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    padding:12px 16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+  .plan-list li span{ font-size:14.5px; font-weight: 500; }
+
+  .note-strip{
+    margin-top:14px;
+    padding:12px 16px;
+    border-left:4px solid var(--blue);
+    background: var(--panel-2);
+    border-radius: 0 4px 4px 0;
+    font-size:13.5px;
+    font-weight: 500;
+  }
+
+  footer{
+    text-align:center;
+    padding:32px 16px;
+    border-top:1px solid var(--line);
+    color:var(--grey-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width:600px){
+    .cat-head { flex-wrap: wrap; gap: 6px; }
+    .shuffle-btn { margin-left: 0; width: 100%; text-align: center; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Engagement Script Library</div>
+  <h1 class="wordmark">Swift Mover<span>Support</span></h1>
+  <p class="tagline">We <b>Answer</b>. We <b>Support</b>. We keep you <span class="accent">Moving</span>.</p>
+</header>
+
+<nav class="jumpnav" id="jumpnav">
+  <a href="#crew">Crew</a>
+  <a href="#truck">Truck</a>
+  <a href="#review">5-Star</a>
+  <a href="#schedule">Schedule</a>
+  <a href="#loading">Load</a>
+  <a href="#memes">Memes</a>
+  <a href="#hiring">Hiring</a>
+  <a href="#appreciation">Appreciation</a>
+  <a href="#community">Community</a>
+  <a href="#conversation">Conversations</a>
+  <a href="#hints">Hints</a>
+  <a href="#missed-calls">Missed Calls</a>
+  <a href="#scripts">Scripts</a>
+  <a href="#plan">Plan</a>
+  <button class="theme-toggle" id="themeToggle" type="button">
+    <span id="themeLabel">Low-Glare Light Theme</span>
+  </button>
+</nav>
+
+<div class="search-container">
+  <input type="text" id="searchInput" class="search-input" placeholder="⚡ Type anywhere to search across categories instantly...">
+</div>
+
+<main id="main"></main>
+
+<footer>
+  SWIFT MOVER SUPPORT — INTERNAL SYSTEM SYSTEM PROMPT ENGAGED
+</footer>
+
+<script>
+const DATA = [
+  { id: "crew", title: "On a Crew Photo", sub: "5 items", items: ["Great looking crew. Hope you guys have a smooth week. 💪", "Teamwork makes all the difference in this business.", "Love seeing companies that take pride in their people.", "Nothing beats a crew that shows up on time and gets it done.", "Customers remember the people more than the truck."] },
+  { id: "truck", title: "On a Moving Truck Photo", sub: "5 items", items: ["Clean truck! First impressions matter.", "Nice setup. Looks ready for another happy customer.", "Sharp branding on the truck.", "A clean truck builds trust before you even knock on the door.", "Looking professional. 👏"] },
+  { id: "review", title: "On a 5-Star Review", sub: "5 items", items: ["Congratulations! Reviews like these aren't easy to earn.", "Happy customers are the best marketing.", "That's what happens when you care about service.", "Another satisfied customer. Keep them coming!", "Love seeing businesses win."] },
+  { id: "schedule", title: "On a Busy Schedule Post", sub: "5 items", items: ["Love seeing the calendar full!", "Wishing you guys a safe and profitable week.", "That's what hard work looks like.", "Stay hydrated out there!", "Hope every move goes smoothly."] },
+  { id: "loading", title: "On Before & After Loading Photos", sub: "5 items", items: ["That's some clean loading.", "Whoever packed that truck knows what they're doing.", "Maximizing space saves everyone time.", "Nicely done.", "That's professional work."] },
+  { id: "memes", title: "On Funny Moving Memes", sub: "5 items", items: ["😂 Every mover can relate to this.", "The accuracy is painful.", "This is too real.", "Been there!", "Love it 😂"] },
+  { id: "hiring", title: "On Hiring Posts", sub: "5 items", items: ["Hope you find some great people. Good movers are hard to come by.", "Wishing you the best with hiring.", "The right crew changes everything.", "Reliable employees are worth their weight in gold.", "Hope you fill the positions quickly."] },
+  { id: "appreciation", title: "On Customer Appreciation Posts", sub: "5 items", items: ["Taking care of customers always pays off.", "That's how you build a reputation.", "People remember companies that care.", "Customer service wins every time.", "Keep up the great work."] },
+  { id: "community", title: "On Community Involvement", sub: "5 items", items: ["Love seeing local businesses give back.", "Respect. Communities need more businesses like this.", "That's awesome.", "Great way to support your community.", "Well done."] },
+  { id: "conversation", title: "Comments That Naturally Start Conversations", sub: "get replies", items: ["What's been your busiest month this year?", "Are weekends still your busiest days?", "Curious... what's the strangest thing you've ever moved?", "How far out are you guys booking these days?", "What's been the biggest challenge this summer?", "Do most of your jobs come from Google or referrals?", "How many trucks are you running now?", "Do you mostly handle local moves or long-distance?", "Do you guys offer packing too?", "What's the craziest staircase you've ever had to deal with? 😂"] },
+  { id: "hints", title: "Comments That Hint at Your Service", sub: "soft hints", items: ["Missed calls can get expensive in this industry.", "Customers usually call the first few movers they find. Whoever answers first usually wins.", "Fast response times make a huge difference.", "Every missed call is probably another mover's booked job.", "Customers rarely leave voicemails anymore.", "Speed wins in the moving business.", "It's amazing how many people book with whoever answers first."] },
+  { id: "missed-calls", title: "Missed Calls & Availability", sub: "deep dialogue", items: ["Curious... how do you handle calls when every crew is out on a job?", "Do you answer your own phones, or does someone in the office handle them?", "How do you make sure you don't miss new customers while everyone's moving?", "When you're on a walkthrough or estimate, who's answering the next call?", "What's your system for handling after-hours calls?", "Are you still able to answer every inbound call during peak season?", "What's been the biggest challenge with keeping up with phone calls?", "Does your team have someone dedicated to answering phones?", "How fast do you try to get back to new leads?", "Have you noticed customers expect an answer almost immediately these days?", "Do most people leave voicemails anymore, or do they just call the next company?", "What's your average response time to new inquiries?", "Do you find text messages work better than callbacks?", "How do you keep estimates organized when calls come in all day?", "Do you ever have days where the phone won't stop ringing?", "What's harder — finding movers or keeping up with incoming calls?", "Does one person manage your schedule, or is it a team effort?", "What's one thing you wish you could automate in your business?", "If you could eliminate one daily headache, what would it be?", "What's the biggest bottleneck in your office right now?", "What's the toughest part of running a moving company that customers never see?", "What's the biggest reason potential customers don't end up booking?"] }
+];
+
+const SCRIPTS = [
+  { title: "Script 1 — \"Tell me about it.\"", lines: [{who:"you", text:"We've noticed a lot of movers lose jobs simply because everyone is out on moves. Are you guys answering calls in-house or does someone handle them for you?"}] },
+  { title: "Script 2 — \"We're always busy.\"", lines: [{who:"mover", text:"We're always busy."}, {who:"you", text:"That's a good problem to have. Are you still able to answer every new call while the crews are out?"}] },
+  { title: "Script 3 — \"We miss a few.\"", lines: [{who:"mover", text:"We miss a few."}, {who:"you", text:"That's exactly what I hear from a lot of owners. Customers don't usually call back — they just move on to the next company."}, {who:"you", text:"That's actually what we help with. We answer incoming calls, respond to missed calls, book estimates, text customers, and keep your calendar full while your crews focus on moving. No pressure — happy to show you how it works if you're ever curious."}] },
+  { title: "Script 4 — \"Yeah, we miss a few when everyone's busy.\"", lines: [{who:"mover", text:"Yeah, we miss a few when everyone's busy."}, {who:"you", text:"That seems to be a common challenge. When someone can't reach you, do they usually leave a voicemail, or do they just move on to another mover?"}, {who:"mover", text:"Mostly they call someone else."}, {who:"you", text:"That makes sense. People moving usually want to book quickly, so they don't wait around. We've been helping moving companies make sure those calls get answered and appointments get booked even when the crews are out. Has that been something you've looked into before?"}] }
+];
+
+const PLAN = [
+  "Leave 15–20 genuine comments per day.",
+  "React to their posts before commenting.",
+  "Reply if they respond.",
+  "Don't pitch on the first interaction.",
+  "After 2–3 interactions, send a friendly DM referencing the conversation."
+];
+
+async function copyText(text, btn){
+  try { await navigator.clipboard.writeText(text); } 
+  catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const original = btn.innerHTML;
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1000);
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function renderApp() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+
+  DATA.forEach((cat, index) => {
+    const section = document.createElement('section');
+    section.className = 'category';
+    section.id = cat.id;
+
+    section.innerHTML = `
+      <div class="cat-head">
+        <span class="cat-index">${String(index + 1).padStart(2, '0')}</span>
+        <h2 class="cat-title">${cat.title}</h2>
+        <button class="shuffle-btn" onclick="shuffleCategory('${cat.id}')">🔀 Shuffle</button>
+        <span class="cat-sub">${cat.sub}</span>
+      </div>
+      <div class="comments-container">
+        ${cat.items.map(text => `
+          <div class="comment-row">
+            <div class="comment-text">${text}</div>
+            <button class="copy-btn" onclick="copyText(\`${text.replace(/"/g, '&quot;')}\`, this)">Copy</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    main.appendChild(section);
+  });
+
+  const scriptSection = document.createElement('section');
+  scriptSection.className = 'category';
+  scriptSection.id = 'scripts';
+  scriptSection.innerHTML = `
+    <div class="cat-head">
+      <span class="cat-index">13</span>
+      <h2 class="cat-title">Transition Scripts</h2>
+      <span class="cat-sub">4 scripts</span>
+    </div>
+    ${SCRIPTS.map(script => `
+      <div class="dialogue">
+        <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;color:var(--blue);margin-bottom:8px;">${script.title}</div>
+        ${script.lines.map(line => `
+          <div class="line ${line.who === 'you' ? 'you-line' : ''}">
+            <span class="who ${line.who}">${line.who === 'you' ? 'You' : 'Mover'}</span>
+            <div class="content">
+              ${line.who === 'you' 
+                ? `<span class="said">${line.text}</span><button class="copy-btn" onclick="copyText(\`${line.text.replace(/"/g, '&quot;')}\`, this)">Copy</button>`
+                : `<span class="said">"${line.text}"</span>`
+              }
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+  `;
+  main.appendChild(scriptSection);
+
+  const planSection = document.createElement('section');
+  planSection.className = 'category';
+  planSection.id = 'plan';
+  planSection.innerHTML = `
+    <div class="cat-head">
+      <span class="cat-index">14</span>
+      <h2 class="cat-title">Weekly Engagement Plan</h2>
+      <span class="cat-sub">5 steps</span>
+    </div>
+    <ul class="plan-list">
+      ${PLAN.map(step => `<li><span>${step}</span></li>`).join('')}
+    </ul>
+    <div class="note-strip">Builds recognition and trust before you ever mention your service.</div>
+  `;
+  main.appendChild(planSection);
+}
+
+function shuffleCategory(id) {
+  const target = DATA.find(cat => cat.id === id);
+  if (target) {
+    shuffleArray(target.items);
+    renderApp();
+    document.getElementById(id).scrollIntoView({ behavior: 'instant' });
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  document.querySelectorAll('.comment-row, .dialogue').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+  document.querySelectorAll('section.category').forEach(section => {
+    const hasVisible = Array.from(section.querySelectorAll('.comment-row, .dialogue')).some(item => item.style.display !== 'none');
+    section.style.display = (hasVisible || !term) ? '' : 'none';
+  });
+});
+
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  themeToggle.innerHTML = `<span id="themeLabel">${isLight ? 'Dark Theme' : 'Low-Glare Light Theme'}</span>`;
+});
+
+renderApp();
+</script>
+</body>
+</html>
